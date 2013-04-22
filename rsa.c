@@ -1,8 +1,10 @@
 
 #include<stdlib.h>
+#include<math.h>
+#include<string.h>
 #include"rsa.h"
 
-bool isprime(const int_r& n){
+int isprime(const int_r* n){
 
 
 }
@@ -15,7 +17,7 @@ int generateRandomNumber(){
 }
 
 
-int_r fastModularExponentiation(int_r base, int_r exponent, int_r m){
+ int_r fastModularExponentiation(int_r base, int_r exponent, int_r m){
 
 
 }
@@ -23,13 +25,21 @@ int_r fastModularExponentiation(int_r base, int_r exponent, int_r m){
 
 struct ipair eea_gcd(int_r a, int_r b){
 
-	if(b == 0)
-		return ipair(1,0);
+	if(b == 0){
+		struct ipair t;
+		t.first = 1;
+		t.second = 0;
+		return t;
+
+	}
 	else{
-		q = a / b;
-		r = a % b;
-		ipair t = eea_gcd(b,r);
-		return( t.second, t.first - q * t.second );
+		int_r q  = a / b;
+		int_r re  = a % b;
+		struct ipair t = eea_gcd(b,re);
+		struct ipair r;
+		r.first  = t.second;
+		r.second = t.first - q*t.second;
+		return r;
 	}
 }
 
@@ -37,15 +47,15 @@ struct ipair eea_gcd(int_r a, int_r b){
 /*Returns a reference to a struct*/
 struct bit_r bit_representation(int_r n){
 
-	bit_r t;
+	struct bit_r t;
 	int sz = (int) ceil(log(n)); /*log(n) bits for an int n */
 	char b[sz + 1];
 	while(n > 0){
 
 		if(n % 2 == 0)
-			strcat(b,0);
+			strcat(b,"0");
 		else
-			strcat(b,1);
+			strcat(b,"1");
 		n /= 2;
 
 	}
