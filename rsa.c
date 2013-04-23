@@ -2,6 +2,7 @@
 #include<stdlib.h>
 #include<math.h>
 #include<string.h>
+#include<assert.h>
 #include"rsa.h"
 
 int isprime(const int_r* n){
@@ -45,27 +46,52 @@ struct ipair eea_gcd(int_r a, int_r b){
 /*Returns a reference to a struct*/
 struct bit_r bit_representation(int_r n){
 
+	int sign_bit = 0;
+	int i ;
+	if(n  <  0 ) { /*Needs a sign bit */
+		n = -1 * n;
+		sign_bit = 1;
+	}
+
 	struct bit_r t;
-	int sz = (int) ceil(log(n)); /*log(n) bits for an int n */
-	char b[sz + 1];
+	/*int sz = (int) ceil(log(n)); /*log(n) bits for an int n */
+	char b[MAX_INT_LEN];
+	memset(b,0,sizeof(b));
 	while(n > 0){
 
 		if(n % 2 == 0)
 			strcat(b,"0");
 		else
 			strcat(b,"1");
-		n /= 2;
+		n >>= 1;
 
 	}
-	t.bits = (char*) malloc(sizeof(b)*(sz+1));
+
+	int start = strlen(b);
+
+	for(i = start ; i < MAX_INT_LEN - 1; i++){
+		strcat(b,"0");
+	}
+	/* Sign bit */
+	if(sign_bit) strcat(b,"1");
+	else strcat(b,"0");
+	t.bits = (char*) malloc(sizeof(b)*(MAX_INT_LEN));
 	strcpy(t.bits,b);
-	t.sz = sz+1;
+	t.sz = MAX_INT_LEN;
 
 	return t;
 }
 
 
 int main(){
+	struct bit_r r;
+	r = bit_representation(10);
+	printf("%d %s\n", r.sz, r.bits);
+	free(r.bits);
 
+	r.sz = 0;
+	r = bit_representation(-10);
+	printf("%d %s\n", r.sz, r.bits);
+	free(r.bits);
 	return 0;
 }

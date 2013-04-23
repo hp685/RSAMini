@@ -3,6 +3,7 @@
 #endif
 
 #define MAX_BITS 5
+#define MAX_INT_LEN 32
 /*Allowed to hold larger values later*/
 typedef int int_r; /* Prime integer-- 32 bit suffices in our case*/
 
@@ -11,7 +12,6 @@ struct ipair{
 };
 
 struct bit_r{
-
 	char* bits;
 	int sz; /*Number of bits*/
 };
