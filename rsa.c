@@ -1,4 +1,4 @@
-
+#include<stdio.h>
 #include<stdlib.h>
 #include<math.h>
 #include<string.h>
@@ -36,9 +36,7 @@ struct ipair eea_gcd(int_r a, int_r b){
 		int_r q  = a / b;
 		int_r re  = a % b;
 		struct ipair t = eea_gcd(b,re);
-		struct ipair r;
-		r.first  = t.second;
-		r.second = t.first - q*t.second;
+		struct ipair r = {t.second, t.first-q*t.second};
 		return r;
 	}
 }
@@ -64,4 +62,10 @@ struct bit_r bit_representation(int_r n){
 	t.sz = sz+1;
 
 	return t;
+}
+
+
+int main(){
+
+	return 0;
 }
