@@ -44,7 +44,8 @@ struct ipair eea_gcd(int_r a, int_r b){
 
 /*int_r to its binary form: Returns a pointer to bits and its size */
 /*Returns a reference to a struct*/
-struct bit_r bit_representation(int_r n){
+/*MAX_INT_LEN is essentially 31 bits*/
+struct bit_r* bit_representation(int_r n){
 
 	int sign_bit = 0;
 	int i ;
@@ -53,7 +54,7 @@ struct bit_r bit_representation(int_r n){
 		sign_bit = 1;
 	}
 
-	struct bit_r t;
+	struct bit_r* t = (struct bit_r*)malloc(sizeof(struct bit_r*));
 	/*int sz = (int) ceil(log(n)); /*log(n) bits for an int n */
 	char b[MAX_INT_LEN];
 	memset(b,0,sizeof(b));
@@ -75,23 +76,25 @@ struct bit_r bit_representation(int_r n){
 	/* Sign bit */
 	if(sign_bit) strcat(b,"1");
 	else strcat(b,"0");
-	t.bits = (char*) malloc(sizeof(b)*(MAX_INT_LEN));
-	strcpy(t.bits,b);
-	t.sz = MAX_INT_LEN;
+	t->bits = (char*) malloc(sizeof(b)*(MAX_INT_LEN));
+	strcpy(t->bits,b);
+	t->sz = MAX_INT_LEN;
 
 	return t;
 }
 
 
 int main(){
-	struct bit_r r;
-	r = bit_representation(10);
-	printf("%d %s\n", r.sz, r.bits);
-	free(r.bits);
 
-	r.sz = 0;
+	struct bit_r* r;
+	r = bit_representation(1000);
+	printf("%d %s\n", r->sz, r->bits);
+	free(r->bits);
+	free(r);
+
 	r = bit_representation(-10);
-	printf("%d %s\n", r.sz, r.bits);
-	free(r.bits);
+	printf("%d %s\n", r->sz, r->bits);
+	free(r->bits);
+	free(r);
 	return 0;
 }

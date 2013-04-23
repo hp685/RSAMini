@@ -19,4 +19,4 @@ int isprime(const int_r*); /* Miller-Rabin Primality testing */
 int generateRandomNumber();  /* Wrapper to the C rand() */
 int_r fastModularExponentiation(int_r, int_r, int_r);
 struct ipair eea_gcd(int_r , int_r ); /* Extended Euclidean Algorithm */
-struct bit_r bit_representation(int_r );
+struct bit_r* bit_representation(int_r );
