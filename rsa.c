@@ -23,10 +23,13 @@ int_r fastModularExponentiation(int_r base, int_r exponent, int_r m){
 
 }
 
+/*Limit to this file*/
+/*In place*/
 static
 char* reverse(char* s, int sz){
 
 	int i;
+	printf("%d\n",sz);
 	for(i = 0; i < (sz>>1); i++){
 		char t  = s[i];
 		s[i] = s[sz - i - 1];
@@ -35,10 +38,11 @@ char* reverse(char* s, int sz){
 	return s;
 }
 
-
+/*Extended euclidean algorithm for multiplicative inverses*/
 struct ipair eea_gcd(int_r a, int_r b){
 
 	if(b == 0){
+
 		struct ipair t;
 		t.first = 1;
 		t.second = 0;
@@ -89,6 +93,7 @@ struct bit_r* bit_representation(int_r n){
 	/* Sign bit */
 	if(sign_bit) strcat(b,"1");
 	else strcat(b,"0");
+	/*Allocate space for the bits*/
 	t->bits = (char*) malloc(sizeof(b)*(MAX_INT_LEN));
 	strcpy(t->bits,b);
 	t->sz = MAX_INT_LEN;
@@ -99,6 +104,7 @@ struct bit_r* bit_representation(int_r n){
 
 int main(){
 
+	/*TESTS*/
 	struct bit_r* r;
 	r = bit_representation(1000);
 	printf("%d %s\n", r->sz, r->bits);
@@ -110,5 +116,16 @@ int main(){
 	free(r->bits);
 	free(r);
 
+	struct ipair eg = eea_gcd(10,15);
+	printf("%d %d\n", eg.first, eg.second);
+
+	char *name = "Harsh";
+	char *nname = (char*)malloc(sizeof(name));
+	strcpy(nname, name);/*Mutability*/
+
+	char *ret = reverse(nname, strlen(name));
+	printf("%s\n", ret);
+	free(nname);
 	return 0;
+
 }
