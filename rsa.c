@@ -18,9 +18,21 @@ int generateRandomNumber(){
 }
 
 
- int_r fastModularExponentiation(int_r base, int_r exponent, int_r m){
+int_r fastModularExponentiation(int_r base, int_r exponent, int_r m){
 
 
+}
+
+static
+char* reverse(char* s, int sz){
+
+	int i;
+	for(i = 0; i < (sz>>1); i++){
+		char t  = s[i];
+		s[i] = s[sz - i - 1];
+		s[sz - i - 1] = t;
+	}
+	return s;
 }
 
 
@@ -47,6 +59,7 @@ struct ipair eea_gcd(int_r a, int_r b){
 /*MAX_INT_LEN is essentially 31 bits*/
 struct bit_r* bit_representation(int_r n){
 
+	char b[MAX_INT_LEN];
 	int sign_bit = 0;
 	int i ;
 	if(n  <  0 ) { /*Needs a sign bit */
@@ -56,7 +69,7 @@ struct bit_r* bit_representation(int_r n){
 
 	struct bit_r* t = (struct bit_r*)malloc(sizeof(struct bit_r*));
 	/*int sz = (int) ceil(log(n)); /*log(n) bits for an int n */
-	char b[MAX_INT_LEN];
+
 	memset(b,0,sizeof(b));
 	while(n > 0){
 
@@ -79,7 +92,7 @@ struct bit_r* bit_representation(int_r n){
 	t->bits = (char*) malloc(sizeof(b)*(MAX_INT_LEN));
 	strcpy(t->bits,b);
 	t->sz = MAX_INT_LEN;
-
+	t->bits = reverse(t->bits, t->sz);
 	return t;
 }
 
@@ -96,5 +109,6 @@ int main(){
 	printf("%d %s\n", r->sz, r->bits);
 	free(r->bits);
 	free(r);
+
 	return 0;
 }
