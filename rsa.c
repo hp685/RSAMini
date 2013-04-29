@@ -16,6 +16,7 @@ int generateRandomNumber(){
 }
 
 /*In class version of Miller-Rabin*/
+/*Eveything modulo m */
 int isPrime(int_r base, int_r exponent, int_r m){
 
 	int_r y = 1;
@@ -30,11 +31,11 @@ int isPrime(int_r base, int_r exponent, int_r m){
 			return 0;
 		}
 		if(exp_bits->bits[i] == '1'){
-			y = (a * y) % m;
+			y = (base * y) % m;
 		}
 	}
 
-	y == 1 ? return 1 : return 0;
+	return (y == 1) ? 1 : 0;
 
 }
 
@@ -140,6 +141,9 @@ int main(){
 	char *ret = reverse(nname, strlen(name));
 	printf("%s\n", ret);
 	free(nname);
+
+	int b = isPrime(3, 2 , 6);
+	printf("%d\n",b);
 	return 0;
 
 }

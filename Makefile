@@ -1,2 +1,2 @@
 rsa : rsa.c rsa.h
-	gcc rsa.c -lm
+	gcc rsa.c -o rsa -lm
