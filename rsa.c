@@ -17,21 +17,29 @@ int generateRandomNumber(){
 
 /*In class version of Miller-Rabin*/
 /*Eveything modulo m */
-int isPrime(int_r base, int_r exponent, int_r m){
+int isPrime(const int_r base, const int_r exponent){
 
 	int_r y = 1;
-	int_r k = (int)log(exponent);
+	int_r k = 1 + (int)ceil(log(exponent));
+	/*Disregard the other bits in bit representation*/
 	struct bit_r* exp_bits = bit_representation(exponent);
+	printf("Binary Representation of the exponent: %s\n", exp_bits->bits);
+	printf("\n");
 	int i;
 
-	for( i = 0; i < k; i++){
+	for( i = k; i > 0; i--){
 		int_r z = y;
-		y = (y * y) % m;
-		if( y == 1 && z != 1 && z != (m-1) ){
+		y = (y * y) % exponent;
+
+		printf("i:%d x:%c y:%d z:%d\n", MAX_INT_LEN - i  ,exp_bits->bits[i], y, z);
+
+		if( y == 1 && z != 1 && z != (exponent - 1) ){
 			return 0;
 		}
-		if(exp_bits->bits[i] == '1'){
-			y = (base * y) % m;
+
+
+		if(exp_bits->bits[MAX_INT_LEN - i] == '1'){
+			y =  y *  base % exponent ;
 		}
 	}
 	/*Free bit_r*/
@@ -77,7 +85,7 @@ struct ipair eea_gcd(int_r a, int_r b){
 
 /*int_r to its binary form: Returns a pointer to bits and its size */
 /*Returns a reference to a struct*/
-/*MAX_INT_LEN is essentially 31 bits*/
+/*MAX_INT_LEN is essentially 31 bits -- 0 thru 30 */
 struct bit_r* bit_representation(int_r n){
 
 	char b[MAX_INT_LEN];
@@ -144,9 +152,12 @@ int main(){
 	printf("%s\n", ret);
 	free(nname);
 
-	int b = isPrime(3, 2, 6); /*returns true*/
+	int b = isPrime(3, 2); /*returns true*/
 	assert(b == 1);
-	printf("%d\n",b);
+
+	int nb = isPrime(2, 27);
+	assert(nb == 0);
+
 	return 0;
 
 }
