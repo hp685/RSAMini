@@ -34,7 +34,9 @@ int isPrime(int_r base, int_r exponent, int_r m){
 			y = (base * y) % m;
 		}
 	}
-
+	/*Free bit_r*/
+	free(exp_bits->bits);
+	free(exp_bits);
 	return (y == 1) ? 1 : 0;
 
 }
@@ -142,7 +144,8 @@ int main(){
 	printf("%s\n", ret);
 	free(nname);
 
-	int b = isPrime(3, 2 , 6);
+	int b = isPrime(3, 2, 6); /*returns true*/
+	assert(b == 1);
 	printf("%d\n",b);
 	return 0;
 
