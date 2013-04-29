@@ -5,10 +5,8 @@
 #include<assert.h>
 #include"rsa.h"
 
-int isprime(const int_r* n){
 
 
-}
 
 /*May need a sophisticated random generator later*/
 int generateRandomNumber(){
@@ -17,9 +15,26 @@ int generateRandomNumber(){
 	return r;
 }
 
+/*In class version of Miller-Rabin*/
+int isPrime(int_r base, int_r exponent, int_r m){
 
-int_r fastModularExponentiation(int_r base, int_r exponent, int_r m){
+	int_r y = 1;
+	int_r k = (int)log(exponent);
+	struct bit_r* exp_bits = bit_representation(exponent);
+	int i;
 
+	for( i = 0; i < k; i++){
+		int_r z = y;
+		y = (y * y) % m;
+		if( y == 1 && z != 1 && z != (m-1) ){
+			return 0;
+		}
+		if(exp_bits->bits[i] == '1'){
+			y = (a * y) % m;
+		}
+	}
+
+	y == 1 ? return 1 : return 0;
 
 }
 
@@ -29,7 +44,6 @@ static
 char* reverse(char* s, int sz){
 
 	int i;
-	printf("%d\n",sz);
 	for(i = 0; i < (sz>>1); i++){
 		char t  = s[i];
 		s[i] = s[sz - i - 1];
@@ -83,9 +97,9 @@ struct bit_r* bit_representation(int_r n){
 			strcat(b,"1");
 		n >>= 1;
 
-	}
+   	}
 
-	int start = strlen(b);
+  	int start = strlen(b);
 
 	for(i = start ; i < MAX_INT_LEN - 1; i++){
 		strcat(b,"0");

@@ -15,8 +15,8 @@ struct bit_r{
 	char* bits;
 	int sz; /*Number of bits*/
 };
-int isprime(const int_r*); /* Miller-Rabin Primality testing */
+int isprime(const int_r base, int_r exponent, int_r m); /* Miller-Rabin Primality testing */
 int generateRandomNumber();  /* Wrapper to the C rand() */
-int_r fastModularExponentiation(int_r, int_r, int_r);
+
 struct ipair eea_gcd(int_r , int_r ); /* Extended Euclidean Algorithm */
 struct bit_r* bit_representation(int_r );
