@@ -9,9 +9,9 @@
 
 
 /*May need a sophisticated random generator later*/
-int generateRandomNumber(){
+int generateRandomBits(){
 
-	int r = rand() % MAX_BITS;
+	int r = rand() % 2;
 	return r;
 }
 
