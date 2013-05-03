@@ -30,7 +30,7 @@ int isPrime(const int_r base, const int_r exponent){
 		int_r z = y;
 		y = (y * y) % exponent;
 
-		printf("i:%d x:%c y:%d z:%d\n", MAX_INT_LEN - i  ,exp_bits->bits[i], y, z);
+		printf("i:%d x:%c y:%d z:%d\n", MAX_INT_LEN - i , exp_bits->bits[i], y, z);
 
 		if( y == 1 && z != 1 && z != (exponent - 1) ){
 			return 0;
