@@ -4,6 +4,7 @@
 #include<string.h>
 #include<assert.h>
 #include"rsa.h"
+#include "certificate.h"
 
 /*Euclidean gcd*/
 static
@@ -69,6 +70,66 @@ prime_pair* generate_prime_pair(){
 
 	return pp;
 }
+
+
+
+
+
+/* R -- Pair <Person, Public Key>
+   S -- Signature
+
+  R Spec:
+
+  Bytes 1-6 : Name
+  Bytes 7-10: n padded with leading zero bits
+  Bytes 11-14: e padded with leading zero bits
+
+  S Spec:
+
+  Partition R into one byte blocks and compute XOR
+  which will be the hash value
+
+ */
+
+
+struct
+certificate* create_certificate(char *name, int sz){
+
+	/*R*/
+	assert(sz < 7);
+	int i;
+	struct person* cp = (struct person*)malloc(sizeof(struct person));
+	struct certificate* cf = (struct certificate*) malloc(sizeof(struct certificate));
+	char *pname;
+	char *cr;
+	/*Name padding*/
+	if (sz < 6) {
+		for(i = 0; i < 6 - strlen(name); i++){
+			strcat(pname,' ');
+		}
+		strcat(pname,name);
+		assert(strlen(pname) == 6);
+	}
+
+	/*Bit representation of n*/
+	struct key_pair* kp = generate_key_pair();
+	bit_r *bn = bit_representation(kp->p * kp->q);
+	bit_r *be = bit_representation(kp->e);
+	strcat(cr,name);
+	strcat(cr,bn);
+	strcat(cr,be);
+
+
+
+	/*Create a certificate*/
+	cf->r = cr;
+	/**Signing*/
+
+	/*S*/
+
+}
+
+
 
 
 int main(){

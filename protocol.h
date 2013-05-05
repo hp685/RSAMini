@@ -5,8 +5,9 @@
 
 struct key_pair{
 
-	int_r e, d, phi_n, p , q;
+	int_r e, d, phi_n, p, q;
 };
+
 
 /*   n = (p * q)    */
 struct prime_pair{

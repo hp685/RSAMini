@@ -1,20 +1,22 @@
-#ifndef CERTIFICATE_H
-#define CERTIFICATE_H
-#endif
+#ifndef _CERTIFICATE_H
+#define _CERTIFICATE_H
+
 
 
 struct person{
 
 	char* name;
 	int name_sz;
-
+	struct keypair kp;
 }
 
 /**/
 struct certificate{
 
-	struct person p;
+	char* r;
 	char* signature;
 	int signature_sz;
 
 }
+
+#endif
