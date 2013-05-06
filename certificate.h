@@ -14,8 +14,10 @@ struct person{
 struct certificate{
 
 	char* r;
+	char* h;
 	char* signature;
 	int signature_sz;
+	int_r hs; /*Signature stored as an int_r*/
 
 }
 

@@ -119,13 +119,32 @@ certificate* create_certificate(char *name, int sz){
 	strcat(cr,bn);
 	strcat(cr,be);
 
-
-
 	/*Create a certificate*/
 	cf->r = cr;
+	char *current = NULL;
+	/*Compute h(r)*/
+	for(i = 1; i <= strlen(cf->r); i++){
+		strcat(current,cf->r[i]);
+		if(i % 8 == 0){
+			cf->h ^= current;
+			current = NULL;
+		}
+	}
+	/*S*/
 	/**Signing*/
 
-	/*S*/
+	/*Should be 8 bits*/
+	assert(strlen(cf->h) == 8);
+
+	bit_r *h = (struct bit_r*) malloc(sizeof(struct bit_r));
+	h->bits  = cf->h;
+	h->sz    = strlen(cf->h);
+
+	/*Store it as an int_r*/
+	int_r hs = bits_to_int_r(h);
+	cf->hs   = hs;
+
+
 
 }
 
