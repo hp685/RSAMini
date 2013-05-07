@@ -122,33 +122,49 @@ prime_pair* generate_prime_pair(){
 void create_certificate(struct person *p1, struct person *p2){
 
 	/*R*/
-	printf("IN Create Certificate\n");
 	int i;
 
 	struct certificate* cf = (struct certificate*) malloc(sizeof(struct certificate));
-	char *cr;
+	char *cr =(char*) malloc(sizeof(char) * 114);
 
 	/*Bit representation of n*/
 
 	struct bit_r *bn = bit_representation(p1->kp->p * p1->kp->q);
 	struct bit_r *be = bit_representation(p1->kp->e);
-	strcat(cr,p1->name);
-	strcat(cr,bn->bits);
-	strcat(cr,be->bits);
+#ifdef TRACE
+	printf("%s\n",p1->name);
+	printf("%s\n",bn->bits);
+	printf("%s\n",be->bits);
+#endif
+	strcat(cr,(const char*)p1->name);
+	strcat(cr,(const char*)bn->bits);
+	strcat(cr,(const char*)be->bits);
 
 	/*Create a certificate*/
 	cf->r = cr;
-	char *current = '\0';
-	/*Compute h(r)*/
-	for(i = 1; i <= strlen(cf->r); i++){
+	printf("%s\n",cf->r);
+	char *current = (char*) malloc(sizeof(char) * 8  + 1);
 
-		strcat(current,(char*)cf->r[i]);
-		if(i % 8 == 0){
-			printf("%d\n",cf->hs);
-			cf->hs ^= bits_to_int_r(current);
-			current = '\0';
-		}
+
+	/*Compute h(r)*/
+	for(i = 0; i < NUM_BYTES; i++){
+		printf("I : %d\n",i);
+		strncat(current,(const char*)cf->r,8);
+
+		struct bit_r *n = (struct bit_r *)malloc(sizeof(struct bit_r));
+		strcpy(n->bits,(const char*)current);
+		free(n->bits);
+		free(n);
+		cf->hs ^= bits_to_int_r(n);
+		printf("%d\n",cf->hs);
+
+
+
 	}
+	free(be->bits);
+	free(bn->bits);
+	free(be);
+	free(bn);
 	/*S*/
 	/**Signing*/
 
@@ -168,10 +184,12 @@ int main(){
 
 
 	int i;
-	for(i = 0; i < 20; i++){
-		int_r prime = candidate_primes();
-		printf("%d\n",prime);
-	}
+
+	/* for(i = 0; i < 20; i++){ */
+	/* 	int_r prime = candidate_primes(); */
+	/* 	printf("%d\n",prime); */
+	/* } */
+
 
 	struct person *p1 = (struct person*)malloc(sizeof(struct person));
 	/*Alice*/

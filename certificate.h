@@ -1,6 +1,7 @@
 #ifndef _CERTIFICATE_H
 #define _CERTIFICATE_H
 
+#define NUM_BYTES 14
 
 struct key_pair{
 
