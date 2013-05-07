@@ -3,8 +3,10 @@
 #include<math.h>
 #include<string.h>
 #include<assert.h>
-#include"rsa.h"
+#include "rsa.h"
 #include "certificate.h"
+
+#define TRACE
 
 /*Euclidean gcd*/
 static
@@ -17,6 +19,24 @@ int gcd(int_r a, int_r b){
 }
 
 
+int_r fast_exponentiation(int_r a, int_r b, int_r c){
+
+	int_r y = 1;
+	struct bit_r *x = bit_representation(b);
+
+	int i;
+
+	for(i = strlen(x->bits); i >= 0; i--){
+		if(x->bits[i] == '1'){
+			y = y * y % c;
+		}
+	}
+
+	free(x->bits);
+	free(x);
+	return y;
+}
+
 /*e, d, phi_n, p, q*/
 struct
 key_pair* generate_key_pair(){
@@ -27,15 +47,17 @@ key_pair* generate_key_pair(){
 	int i ;
 	int is_coprime = 0;
 
-	struct keypair *kp = (struct key_pair*) malloc(sizeof(struct key_pair));
+	struct key_pair *kp = (struct key_pair*) malloc(sizeof(struct key_pair));
+
 	for( i = 3; ;i++){ /*Generate e*/
 
 		struct prime_pair *pp = generate_prime_pair();
+		/*Needs a recursive structure here: When i exceeds phi_n*/
 
 		int is_coprime = gcd(i, pp->phi_n);
 		if(is_coprime){
 			/*Find the multiplicative inverse d*/
-			struct ipair r = eea_gcd(phi_n, i);
+			struct ipair r = eea_gcd(pp->phi_n, i);
 
 			kp->e     = i;
 			kp->d     = r.second;
@@ -48,6 +70,7 @@ key_pair* generate_key_pair(){
 				continue;
 			/* Bad idea to have e == d */
 			assert( kp->e != kp->d );
+
 			return kp;
 		}
 
@@ -63,10 +86,14 @@ prime_pair* generate_prime_pair(){
 	int_r q = candidate_primes();
 	int_r phi_n = (p-1) * (q - 1);
 
-	struct *pp = (struct prime_pair*)malloc(sizeof(prime_pair));
+	struct prime_pair *pp = (struct prime_pair*) malloc(sizeof(struct prime_pair));
 	pp->p = p;
 	pp->q = q;
 	pp->phi_n = phi_n;
+
+#ifdef TRACE
+	printf("p:%d q:%d p*q:%d phi_n:%d \n", p, q, p * q, phi_n);
+#endif
 
 	return pp;
 }
@@ -92,57 +119,43 @@ prime_pair* generate_prime_pair(){
  */
 
 
-struct
-certificate* create_certificate(char *name, int sz){
+void create_certificate(struct person *p1, struct person *p2){
 
 	/*R*/
-	assert(sz < 7);
+	printf("IN Create Certificate\n");
 	int i;
-	struct person* cp = (struct person*)malloc(sizeof(struct person));
+
 	struct certificate* cf = (struct certificate*) malloc(sizeof(struct certificate));
-	char *pname;
 	char *cr;
-	/*Name padding*/
-	if (sz < 6) {
-		for(i = 0; i < 6 - strlen(name); i++){
-			strcat(pname,' ');
-		}
-		strcat(pname,name);
-		assert(strlen(pname) == 6);
-	}
 
 	/*Bit representation of n*/
-	struct key_pair* kp = generate_key_pair();
-	bit_r *bn = bit_representation(kp->p * kp->q);
-	bit_r *be = bit_representation(kp->e);
-	strcat(cr,name);
-	strcat(cr,bn);
-	strcat(cr,be);
+
+	struct bit_r *bn = bit_representation(p1->kp->p * p1->kp->q);
+	struct bit_r *be = bit_representation(p1->kp->e);
+	strcat(cr,p1->name);
+	strcat(cr,bn->bits);
+	strcat(cr,be->bits);
 
 	/*Create a certificate*/
 	cf->r = cr;
-	char *current = NULL;
+	char *current = '\0';
 	/*Compute h(r)*/
 	for(i = 1; i <= strlen(cf->r); i++){
-		strcat(current,cf->r[i]);
+
+		strcat(current,(char*)cf->r[i]);
 		if(i % 8 == 0){
-			cf->h ^= current;
-			current = NULL;
+			printf("%d\n",cf->hs);
+			cf->hs ^= bits_to_int_r(current);
+			current = '\0';
 		}
 	}
 	/*S*/
 	/**Signing*/
 
 	/*Should be 8 bits*/
-	assert(strlen(cf->h) == 8);
+	assert(strlen(cf->hs) == 8);
 
-	bit_r *h = (struct bit_r*) malloc(sizeof(struct bit_r));
-	h->bits  = cf->h;
-	h->sz    = strlen(cf->h);
-
-	/*Store it as an int_r*/
-	int_r hs = bits_to_int_r(h);
-	cf->hs   = hs;
+	cf->signature = fast_exponentiation(cf->hs, p2->kp->e, p2->kp->p * p2->kp->q);
 
 
 
@@ -152,6 +165,31 @@ certificate* create_certificate(char *name, int sz){
 
 
 int main(){
+
+
+	int i;
+	for(i = 0; i < 20; i++){
+		int_r prime = candidate_primes();
+		printf("%d\n",prime);
+	}
+
+	struct person *p1 = (struct person*)malloc(sizeof(struct person));
+	/*Alice*/
+
+	p1->name = (char*) malloc(sizeof(char) * 50);
+	p1->name = "0000000000100000101101100011010010110001101100101";
+
+	p1->kp   = generate_key_pair();
+
+
+
+	struct person *p2 = (struct person*)malloc(sizeof(struct person));
+	/*Trent*/
+	p2->name = "000000000101010001110010011001010110111001110100";
+	p2->kp   = generate_key_pair();
+
+	/*Signing*/
+	create_certificate(p1, p2->kp->d);
 
 
 }

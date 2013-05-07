@@ -2,23 +2,40 @@
 #define _CERTIFICATE_H
 
 
+struct key_pair{
 
-struct person{
+	int_r e, d, phi_n, p, q;
+};
 
-	char* name;
-	int name_sz;
-	struct keypair kp;
-}
+
+/*   n = (p * q)    */
+struct prime_pair{
+
+	int_r p, q;
+	int_r phi_n;
+};
+
 
 /**/
 struct certificate{
 
 	char* r;
 	char* h;
-	char* signature;
-	int signature_sz;
 	int_r hs; /*Signature stored as an int_r*/
+	int_r signature; /*decrypted with Trent's private key*/
+};
 
-}
+
+struct person{
+
+	char* name;
+	struct key_pair* kp;
+	struct certificate* cf;
+};
+
+
+struct key_pair* generate_key_pair();
+struct prime_pair* generate_prime_pair();
+
 
 #endif

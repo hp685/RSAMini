@@ -8,7 +8,7 @@
 
 
 #define TEST
-//#undef TEST
+#undef TEST
 
 static int seed = 0;
 /*May need a sophisticated random generator later*/
@@ -26,8 +26,9 @@ int isPrime(const int_r base, const int_r exponent){
 	int_r k = 1 + (int)ceil(log(exponent));
 	/*Disregard the other bits in bit representation*/
 	struct bit_r* exp_bits = bit_representation(exponent-1);
+#ifdef DEBUG
 	printf("Binary Representation of the exponent: %s\n", exp_bits->bits);
-
+#endif
 	int i;
 
 	for( i = k; i > 0; i--){
@@ -201,7 +202,9 @@ int_r candidate_primes(){
 	for(i = 0; i < NUM_CHECKS; i++){
 		p = generateRandomNumbers();
 		int_r a = bits_to_int_r(p)%(x-1);
+#ifdef DEBUG
 		printf("%d %d\n",a,x);
+#endif
 		pass = isPrime(a,x);
 
 		if(!pass)
@@ -257,8 +260,10 @@ int main(){
 	//printf("Random Number bits %s, %d\n", rn->bits, rn->sz);
 	//printf("Bits to Int: %d\n", bits_to_int_r(rn));
 
-	int_r prime = candidate_primes();
-	printf("%d\n",prime);
+	for(i = 0; i < 20; i++){
+		int_r prime = candidate_primes();
+		printf("%d\n",prime);
+	}
 
 	/* For(i = 0 ; i < 20; i++){ */
 	/* 	srand(getpid()); */
