@@ -68,7 +68,8 @@ char* reverse(char* s, int sz){
 }
 
 /*Extended euclidean algorithm for multiplicative inverses*/
-struct ipair eea_gcd(int_r a, int_r b){
+struct
+ipair eea_gcd(int_r a, int_r b){
 
 	if(b == 0){
 
@@ -90,7 +91,8 @@ struct ipair eea_gcd(int_r a, int_r b){
 /*int_r to its binary form: Returns a pointer to bits and its size */
 /*Returns a reference to a struct*/
 /*MAX_INT_LEN is essentially 31 bits -- 0 thru 30 */
-struct bit_r* bit_representation(int_r n){
+struct
+bit_r* bit_representation(int_r n){
 
 	char b[MAX_INT_LEN];
 	int sign_bit = 0;
@@ -134,7 +136,8 @@ struct bit_r* bit_representation(int_r n){
 
 
  /* Generates candidate primes according to the spec*/
- struct bit_r* generateRandomNumbers(){
+struct
+bit_r* generateRandomNumbers(){
 
 	 /*Pad the leading bits*/
 
