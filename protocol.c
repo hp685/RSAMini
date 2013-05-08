@@ -22,18 +22,24 @@ int gcd(int_r a, int_r b){
 int_r fast_exponentiation(int_r a, int_r b, int_r c){
 
 	int_r y = 1;
-	struct bit_r *x = bit_representation(b);
 
+	struct bit_r *x = bit_representation(b);
+	printf("%s\n",x->bits);
 	int i;
 
-	for(i = strlen(x->bits); i >= 0; i--){
-		if(x->bits[i] == '1'){
-			y = y * y % c;
+	for(i = strlen(x->bits) ; i > 0; i--){
+		y = (y * y) % c;
+		if(x->bits[MAX_INT_LEN - i] == '1'){
+			y = (a * y) % c;
+
 		}
+
+
 	}
 
 	free(x->bits);
 	free(x);
+
 	return y;
 }
 
@@ -125,7 +131,7 @@ void create_certificate(struct person *p1, struct person *p2){
 	int i;
 
 	struct certificate* cf = (struct certificate*) malloc(sizeof(struct certificate));
-	char *cr =(char*) malloc(sizeof(char) * 114);
+	char *cr =(char*) malloc(sizeof(char) * 150);
 
 	/*Bit representation of n*/
 
@@ -141,40 +147,46 @@ void create_certificate(struct person *p1, struct person *p2){
 	strcat(cr,(const char*)be->bits);
 
 	/*Create a certificate*/
-	cf->r = cr;
+	cf->r =(char*) malloc(sizeof(char) * strlen(cr));
+
+	strcpy(cf->r, (const char*)cr);
+
 	printf("%s\n",cf->r);
-	char *current = (char*) malloc(sizeof(char) * 8  + 1);
+
+	char *current = (char*) malloc(sizeof(char) * 10);
 
 
 	/*Compute h(r)*/
-	for(i = 0; i < NUM_BYTES; i++){
-		printf("I : %d\n",i);
-		strncat(current,(const char*)cf->r,8);
+	for(i = 0; i < strlen(cr); i++){
 
-		struct bit_r *n = (struct bit_r *)malloc(sizeof(struct bit_r));
-		strcpy(n->bits,(const char*)current);
-		free(n->bits);
-		free(n);
-		cf->hs ^= bits_to_int_r(n);
-		printf("%d\n",cf->hs);
 
+		char a[2];
+		a[0]= cr[i];
+		a[1] = '\0';
+		strcat(current, (const char*)a);
+
+		if((i + 1) % 8  == 0){
+			struct bit_r *b = (struct bit_r*)malloc(sizeof(struct bit_r));
+			b->bits = (char*) malloc(sizeof(char*) * strlen(current));
+			strcpy(b->bits,current);
+			cf->hs ^= bits_to_int_r(b);
+			memset(current,'\0',sizeof(current));
+			free(b->bits);
+			free(b);
+
+		}
 
 
 	}
-	free(be->bits);
-	free(bn->bits);
-	free(be);
-	free(bn);
+
 	/*S*/
 	/**Signing*/
 
 	/*Should be 8 bits*/
-	assert(strlen(cf->hs) == 8);
 
+	printf("%d\n",p2->kp->e);
 	cf->signature = fast_exponentiation(cf->hs, p2->kp->e, p2->kp->p * p2->kp->q);
-
-
-
+	printf("%d\n",cf->signature);
 }
 
 
@@ -201,13 +213,15 @@ int main(){
 
 
 
+
 	struct person *p2 = (struct person*)malloc(sizeof(struct person));
 	/*Trent*/
 	p2->name = "000000000101010001110010011001010110111001110100";
 	p2->kp   = generate_key_pair();
-
+	printf("%d\n",p2->kp->d);
 	/*Signing*/
-	create_certificate(p1, p2->kp->d);
+	create_certificate(p1, p2);
 
+	//TEST	printf("%d\n",fast_exponentiation(5,3,13));
 
 }
