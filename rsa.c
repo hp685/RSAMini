@@ -10,7 +10,7 @@
 #define TEST
 #undef TEST
 
-static int seed = 0;
+
 /*May need a sophisticated random generator later*/
 int generateRandomBits(){
 
@@ -23,7 +23,7 @@ int generateRandomBits(){
 int isPrime(const int_r base, const int_r exponent){
 
 	int_r y = 1;
-	int_r k = 1 + (int)ceil(log(exponent));
+	int_r k = (int)log(exponent);
 	/*Disregard the other bits in bit representation*/
 	struct bit_r* exp_bits = bit_representation(exponent-1);
 #ifdef DEBUG
@@ -83,7 +83,10 @@ ipair eea_gcd(int_r a, int_r b){
 		int_r q  = a / b;
 		int_r re  = a % b;
 		struct ipair t = eea_gcd(b,re);
-		struct ipair r = {t.second, t.first-q*t.second};
+		struct ipair r;
+		r.first = t.second;
+		r.second = t.first - q * t.second;
+
 		return r;
 	}
 }
@@ -152,7 +155,7 @@ bit_r* generateRandomNumbers(){
 
 	 strcpy(numbers->bits, prefix);
 
-	 srand(seed++);
+
 
 	 for(i = 0; i < MAX_BITS; i++){
 		 int a  = generateRandomBits() % 2;
@@ -200,9 +203,11 @@ int_r candidate_primes(){
 	struct bit_r *p = generateRandomNumbers();
 
 	int_r x = bits_to_int_r(p);
+	free(p->bits);
+	free(p);
 	int pass = 0;
 
-	for(i = 0; i < NUM_CHECKS; i++){
+	for(i = 0; i <  NUM_CHECKS; i++){
 		p = generateRandomNumbers();
 		int_r a = bits_to_int_r(p)%(x-1);
 #ifdef DEBUG
@@ -215,7 +220,7 @@ int_r candidate_primes(){
 	}
 	free(p->bits);
 	free(p);
-	return pass == 1 ? x : candidate_primes();
+	return pass == 1 && x != 65 ? x : candidate_primes();
 }
 
 

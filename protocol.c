@@ -61,12 +61,12 @@ key_pair* generate_key_pair(){
 		/*Needs a recursive structure here: When i exceeds phi_n*/
 
 		int is_coprime = gcd(i, pp->phi_n);
-		if(is_coprime){
+		if(is_coprime == 1){
 			/*Find the multiplicative inverse d*/
-			struct ipair r = eea_gcd(pp->phi_n, i);
-
+			struct ipair r = eea_gcd(i, pp->phi_n);
+			printf("Mul Inv: %d %d %d %d\n",i, pp->phi_n, r.first, r.second);
 			kp->e     = i;
-			kp->d     = r.second;
+			kp->d     = (pp->phi_n + r.first) % pp->phi_n;
 			kp->phi_n = pp->phi_n;
 			kp->p     = pp->p;
 			kp->q     = pp->q;
@@ -77,10 +77,20 @@ key_pair* generate_key_pair(){
 			/* Bad idea to have e == d */
 			assert( kp->e != kp->d );
 
+			/* if(kp->e < 0){ */
+			/* 	kp->e = (kp->p * kp->q) + kp->e; */
+			/* 	printf("HERE E: %d\n",kp->e); */
+			/* } */
+			/* if(kp->d < 0){ */
+			/* 	kp->d = (kp->phi_n) + kp->d; */
+			/* 	printf("HERE D: %d\n",kp->d); */
+			/* } */
+
 			return kp;
 		}
 
 	}
+
 }
 
 
@@ -90,7 +100,7 @@ prime_pair* generate_prime_pair(){
 
 	int_r p = candidate_primes();
 	int_r q = candidate_primes();
-	int_r phi_n = (p-1) * (q - 1);
+	int_r phi_n = (p - 1) * (q - 1);
 
 	struct prime_pair *pp = (struct prime_pair*) malloc(sizeof(struct prime_pair));
 	pp->p = p;
@@ -189,12 +199,48 @@ void create_certificate(struct person *p1, struct person *p2){
 	printf("%d\n",cf->signature);
 }
 
+int_r compute_hash_decrypt(struct person *p, int_r u){
 
+	struct bit_r *cr = bit_representation(u);
+	int_r h = 0, i;
+	char *current = (char*) malloc(sizeof(char) * 10);
+
+	/*Compute Hash*/
+	for(i = 0; i < strlen(cr->bits); i++){
+
+		char a[2];
+		a[0]= cr->bits[i];
+		a[1] = '\0';
+		strcat(current, (const char*)a);
+
+		if((i + 1) % 8  == 0){
+
+			struct bit_r *b = (struct bit_r*)malloc(sizeof(struct bit_r));
+			b->bits = (char*) malloc(sizeof(char*) * strlen(current));
+			strcpy(b->bits,current);
+			printf("%s\n",b->bits);
+			h ^= bits_to_int_r(b);
+			memset(current,'\0',sizeof(current));
+			free(b->bits);
+			free(b);
+
+		}
+	}
+
+	free(cr->bits);
+	free(cr);
+	printf("H: %d\n",h);
+	/*Decrypt using private Key*/
+	int_r d = fast_exponentiation(h, p->kp->e, p->kp->p * p->kp->q);
+	printf("V: %d\n",d);
+	return d;
+}
 
 
 int main(){
 
-
+	srand(getpid());
+	printf("_____________________BEGIN TRACE_________________\n");
 	int i;
 
 	/* for(i = 0; i < 20; i++){ */
@@ -221,7 +267,53 @@ int main(){
 	printf("%d\n",p2->kp->d);
 	/*Signing*/
 	create_certificate(p1, p2);
+	int_r u;
+	/*Get the bit representation of Alice's n*/
+	struct bit_r *bu = bit_representation(p1->kp->p * p1->kp->q);
+	char *cu  = malloc(sizeof(char) * MAX_INT_LEN);
 
+	for(i = 0; i < strlen(bu->bits); i++ ){
+		if(bu->bits[i] == '1')
+			break;
+		cu[i] = '0';
+	}
+
+	int j;
+	cu[i] = '1';
+#ifdef TRACE
+	printf("181: K= %d\n", i);
+#endif
+	for(j = i+1; j < strlen(bu->bits); j++){
+		int rb = generateRandomBits() % 2;
+		cu[j] = rb + '0';
+
+	}
+
+	printf("%s\n",cu);
+	struct bit_r *cbu = (struct bit_r *) malloc(sizeof(struct bit_r));
+	cbu->bits = (char*) malloc(sizeof(char) * MAX_INT_LEN);
+	strcpy(cbu->bits, cu);
+	u = bits_to_int_r(cbu);
+#ifdef TRACE
+	printf("182: U = %d\n",u);
+	printf("%s\n",cbu->bits);
+#endif
+
+	/*Send u to Alice so that she can compute h(u)*/
+
+	int_r d = compute_hash_decrypt(p1,u);
+	/*Bob encrypts with Alice's public key*/
+
+	int hu = fast_exponentiation(d,p1->kp->d, p1->kp->p * p1->kp->q);
+	printf("hu: %d\n",hu);
+	printf("N: %d\n",p1->kp->p * p1->kp->q);
+	printf("e,d: %d,%d\n", p1->kp->e, p1->kp->d);
 	//TEST	printf("%d\n",fast_exponentiation(5,3,13));
+	printf("\n");
+	printf("__________________END OF TRACE_________________\n");
 
+
+
+
+	return 0;
 }
