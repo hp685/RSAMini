@@ -6,7 +6,7 @@
 #include<time.h>
 #include"rsa.h"
 
-
+#define TRACE
 #define TEST
 #undef TEST
 
@@ -31,24 +31,30 @@ int isPrime(const int_r base, const int_r exponent){
 #endif
 	int i;
 
-	for( i = k; i > 0; i--){
+	for( i = strlen(exp_bits->bits) - 1; i >= 0; i--){
 		int_r z = y;
 		y = (y * y) % exponent;
 #ifdef DEBUG
 		printf("i:%d x:%c y:%d z:%d\n", MAX_INT_LEN - i , exp_bits->bits[i], y, z);
 #endif
 		if( y == 1 && z != 1 && z != (exponent - 1) ){
-			return 0;
+#ifdef DEBUG
+			printf("103: In Primality: Not a Prime %d\n", base);
+#endif
+		return 0;
 		}
 
 
-		if(exp_bits->bits[MAX_INT_LEN - i] == '1'){
+		if(exp_bits->bits[MAX_INT_LEN -1  - i] == '1'){
 			y =  y *  base % exponent ;
 		}
 	}
 	/*Free bit_r*/
 	free(exp_bits->bits);
 	free(exp_bits);
+#ifdef DEBUG
+	if(y == 1) printf("104: In Primality: A Prime %d\n", base);
+#endif
 	return (y == 1) ? 1 : 0;
 
 }
@@ -158,8 +164,12 @@ bit_r* generateRandomNumbers(){
 
 
 	 for(i = 0; i < MAX_BITS; i++){
-		 int a  = generateRandomBits() % 2;
+		 int a  = generateRandomBits();
 
+#ifdef TRACE
+		 printf("88 : Random number used =  %d\n", a);
+#endif
+		 a %= 2;
 		 if(a == 1)
 			 strcat(numbers->bits,"1");
 		 else
@@ -210,17 +220,22 @@ int_r candidate_primes(){
 	for(i = 0; i <  NUM_CHECKS; i++){
 		p = generateRandomNumbers();
 		int_r a = bits_to_int_r(p)%(x-1);
-#ifdef DEBUG
-		printf("%d %d\n",a,x);
+#ifdef TRACE
+		printf("106: 20 values of a %d for n %d:\n",a,x);
 #endif
 		pass = isPrime(a,x);
 
-		if(!pass)
+		if(!pass){
+#ifdef TRACE
+			printf("103:Not a Prime( 20 a's test): %d\n",x);
+#endif
 			break;
+		}
+		free(p->bits);
+		free(p);
 	}
-	free(p->bits);
-	free(p);
-	return pass == 1 && x != 65 ? x : candidate_primes();
+
+	return pass == 1 ? x : candidate_primes();
 }
 
 
@@ -250,7 +265,7 @@ int main(){
 	//printf("%s\n", ret);
 	//free(nname);
 
-	int b = isPrime(3, 2); /*returns true*/
+	int b = isPrime(81, 2); /*returns true*/
 	assert(b == 1);
 
 	int nb = isPrime(2, 27);

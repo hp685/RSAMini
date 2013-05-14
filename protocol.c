@@ -34,7 +34,6 @@ int_r fast_exponentiation(int_r a, int_r b, int_r c){
 
 		}
 
-
 	}
 
 	free(x->bits);
@@ -100,6 +99,9 @@ prime_pair* generate_prime_pair(){
 
 	int_r p = candidate_primes();
 	int_r q = candidate_primes();
+	while(q == p){
+		q = candidate_primes();
+	}
 	int_r phi_n = (p - 1) * (q - 1);
 
 	struct prime_pair *pp = (struct prime_pair*) malloc(sizeof(struct prime_pair));
@@ -109,6 +111,7 @@ prime_pair* generate_prime_pair(){
 
 #ifdef TRACE
 	printf("p:%d q:%d p*q:%d phi_n:%d \n", p, q, p * q, phi_n);
+
 #endif
 
 	return pp;
@@ -161,7 +164,7 @@ void create_certificate(struct person *p1, struct person *p2){
 
 	strcpy(cf->r, (const char*)cr);
 
-	printf("%s\n",cf->r);
+	printf("161: R(In Bits) = %s\n",cf->r);
 
 	char *current = (char*) malloc(sizeof(char) * 10);
 
@@ -195,8 +198,9 @@ void create_certificate(struct person *p1, struct person *p2){
 	/*Should be 8 bits*/
 
 	printf("%d\n",p2->kp->e);
+
 	cf->signature = fast_exponentiation(cf->hs, p2->kp->e, p2->kp->p * p2->kp->q);
-	printf("%d\n",cf->signature);
+	printf("164: Signature s = %d\n",cf->signature);
 }
 
 int_r compute_hash_decrypt(struct person *p, int_r u){
@@ -229,10 +233,10 @@ int_r compute_hash_decrypt(struct person *p, int_r u){
 
 	free(cr->bits);
 	free(cr);
-	printf("H: %d\n",h);
+	printf("163: h: %d\n",h);
 	/*Decrypt using private Key*/
 	int_r d = fast_exponentiation(h, p->kp->e, p->kp->p * p->kp->q);
-	printf("V: %d\n",d);
+	printf("191: V = %d\n",d);
 	return d;
 }
 
@@ -264,7 +268,7 @@ int main(){
 	/*Trent*/
 	p2->name = "000000000101010001110010011001010110111001110100";
 	p2->kp   = generate_key_pair();
-	printf("%d\n",p2->kp->d);
+
 	/*Signing*/
 	create_certificate(p1, p2);
 	int_r u;
@@ -281,7 +285,7 @@ int main(){
 	int j;
 	cu[i] = '1';
 #ifdef TRACE
-	printf("181: K= %d\n", i);
+	printf("181: K= %d\n", MAX_INT_LEN - i - 1);
 #endif
 	for(j = i+1; j < strlen(bu->bits); j++){
 		int rb = generateRandomBits() % 2;
@@ -289,14 +293,13 @@ int main(){
 
 	}
 
-	printf("%s\n",cu);
 	struct bit_r *cbu = (struct bit_r *) malloc(sizeof(struct bit_r));
 	cbu->bits = (char*) malloc(sizeof(char) * MAX_INT_LEN);
 	strcpy(cbu->bits, cu);
 	u = bits_to_int_r(cbu);
 #ifdef TRACE
 	printf("182: U = %d\n",u);
-	printf("%s\n",cbu->bits);
+	printf("181: %s\n",cbu->bits);
 #endif
 
 	/*Send u to Alice so that she can compute h(u)*/
@@ -305,9 +308,9 @@ int main(){
 	/*Bob encrypts with Alice's public key*/
 
 	int hu = fast_exponentiation(d,p1->kp->d, p1->kp->p * p1->kp->q);
-	printf("hu: %d\n",hu);
-	printf("N: %d\n",p1->kp->p * p1->kp->q);
-	printf("e,d: %d,%d\n", p1->kp->e, p1->kp->d);
+	printf("191: hu: %d\n",hu);
+	printf("N, p ,q: %d,%d,%d\n",p1->kp->p * p1->kp->q,p1->kp->p , p1->kp->q);
+	printf("e,d(Alice): %d,%d\n", p1->kp->e, p1->kp->d);
 	//TEST	printf("%d\n",fast_exponentiation(5,3,13));
 	printf("\n");
 	printf("__________________END OF TRACE_________________\n");
