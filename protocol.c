@@ -33,7 +33,6 @@ int_r fast_exponentiation(int_r a, int_r b, int_r c){
 			y = (a * y) % c;
 
 		}
-
 	}
 
 	free(x->bits);
@@ -76,20 +75,9 @@ key_pair* generate_key_pair(){
 			/* Bad idea to have e == d */
 			assert( kp->e != kp->d );
 
-			/* if(kp->e < 0){ */
-			/* 	kp->e = (kp->p * kp->q) + kp->e; */
-			/* 	printf("HERE E: %d\n",kp->e); */
-			/* } */
-			/* if(kp->d < 0){ */
-			/* 	kp->d = (kp->phi_n) + kp->d; */
-			/* 	printf("HERE D: %d\n",kp->d); */
-			/* } */
-
 			return kp;
 		}
-
 	}
-
 }
 
 
@@ -172,7 +160,6 @@ void create_certificate(struct person *p1, struct person *p2){
 	/*Compute h(r)*/
 	for(i = 0; i < strlen(cr); i++){
 
-
 		char a[2];
 		a[0]= cr[i];
 		a[1] = '\0';
@@ -188,8 +175,6 @@ void create_certificate(struct person *p1, struct person *p2){
 			free(b);
 
 		}
-
-
 	}
 
 	/*S*/
@@ -198,7 +183,6 @@ void create_certificate(struct person *p1, struct person *p2){
 	/*Should be 8 bits*/
 
 	printf("%d\n",p2->kp->e);
-
 	cf->signature = fast_exponentiation(cf->hs, p2->kp->e, p2->kp->p * p2->kp->q);
 	printf("164: Signature s = %d\n",cf->signature);
 }
@@ -274,6 +258,7 @@ int main(){
 	int_r u;
 	/*Get the bit representation of Alice's n*/
 	struct bit_r *bu = bit_representation(p1->kp->p * p1->kp->q);
+
 	char *cu  = malloc(sizeof(char) * MAX_INT_LEN);
 
 	for(i = 0; i < strlen(bu->bits); i++ ){
@@ -309,14 +294,25 @@ int main(){
 
 	int hu = fast_exponentiation(d,p1->kp->d, p1->kp->p * p1->kp->q);
 	printf("191: hu: %d\n",hu);
+	struct bit_r * t = bit_representation(p1->kp->p * p1->kp->q);
+	printf("N(In bits): %s\n", t->bits);
 	printf("N, p ,q: %d,%d,%d\n",p1->kp->p * p1->kp->q,p1->kp->p , p1->kp->q);
 	printf("e,d(Alice): %d,%d\n", p1->kp->e, p1->kp->d);
 	//TEST	printf("%d\n",fast_exponentiation(5,3,13));
 	printf("\n");
 	printf("__________________END OF TRACE_________________\n");
 
-
-
+	free(bu->bits);
+	free(bu);
+	free(cbu->bits);
+	free(cbu);
+	free(t->bits);
+	free(t);
+	free(cu);
+	free(p1->kp);
+	free(p1);
+	free(p2->kp);
+	free(p2);
 
 	return 0;
 }

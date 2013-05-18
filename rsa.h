@@ -16,6 +16,8 @@ struct bit_r{
 	char* bits;
 	int sz; /*Number of bits*/
 };
+
+int generateRandomBits();
 int isPrime(const int_r, const int_r); /* Miller-Rabin Primality testing */
 
 struct bit_r* generateRandomNumbers();  /* Wrapper to the C rand() */

@@ -13,9 +13,7 @@
 
 /*May need a sophisticated random generator later*/
 int generateRandomBits(){
-
-	int r = rand();
-	return r;
+	return rand();
 }
 
 /*In class version of Miller-Rabin*/
