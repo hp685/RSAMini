@@ -302,17 +302,5 @@ int main(){
 	printf("\n");
 	printf("__________________END OF TRACE_________________\n");
 
-	free(bu->bits);
-	free(bu);
-	free(cbu->bits);
-	free(cbu);
-	free(t->bits);
-	free(t);
-	free(cu);
-	free(p1->kp);
-	free(p1);
-	free(p2->kp);
-	free(p2);
-
 	return 0;
 }
